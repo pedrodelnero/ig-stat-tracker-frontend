@@ -48,7 +48,6 @@ const IgProposal = () => {
   };
 
   const loadIgList = useCallback(async () => {
-    // console.log('load porposal', listOfHandles);
     try {
       const { data } = await getHandles();
       let newList = data.map((dataItem) => ({

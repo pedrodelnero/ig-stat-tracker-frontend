@@ -70,8 +70,8 @@ const IgTable = ({ list, setList, loadList }) => {
       duration: 2000,
       isClosable: true,
     });
-    // window.location.reload();
-    loadList();
+    window.location.reload();
+    // loadList();
   };
 
   const deleteIghandle = async (id) => {
