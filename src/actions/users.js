@@ -6,8 +6,8 @@ import { logOut, signUp } from '../utils/isLoggedIn';
 const token = Cookies.get('token');
 
 const userAPI = axios.create({
-  //   baseURL: "https://delnero-review-site.herokuapp.com/user",
-  baseURL: 'http://localhost:5000/',
+  baseURL: 'https://delnero-ig-stat.herokuapp.com',
+  // baseURL: 'http://localhost:5000/',
   headers: { Authorization: `Bearer ${token}` },
 });
 

@@ -4,8 +4,8 @@ import Cookies from 'js-cookie';
 const token = Cookies.get('token');
 
 const handleAPI = axios.create({
-  //   baseURL: "https://delnero-review-site.herokuapp.com/user",
-  baseURL: 'http://localhost:5000',
+  baseURL: 'https://delnero-ig-stat.herokuapp.com',
+  // baseURL: 'http://localhost:5000',
   headers: { Authorization: `Bearer ${token}` },
 });
 

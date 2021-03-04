@@ -24,7 +24,6 @@ const IgProposal = () => {
   const [error, setError] = useState(null);
   const [igUser, setIgUser] = useState(initialState);
   const [listOfHandles, setListOfHandles] = useState([]);
-  console.log('proposal', listOfHandles);
 
   const addHandleToList = async (e) => {
     e.preventDefault();

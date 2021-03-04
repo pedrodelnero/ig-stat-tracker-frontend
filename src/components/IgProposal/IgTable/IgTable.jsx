@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-// import axios from 'axios';
+import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import {
   Checkbox,
@@ -32,7 +32,6 @@ const headers = [
 ];
 
 const IgTable = ({ list, setList, loadList }) => {
-  console.log('table', list);
   const [error, setError] = useState(null);
   const [csvData, setCsvData] = useState([]);
   const csvLinkEl = useRef();
@@ -91,11 +90,14 @@ const IgTable = ({ list, setList, loadList }) => {
 
     console.log('selected', selectedHandles);
     try {
-      // const { data } = await axios.post('http://localhost:5000/ig-proposal', {
-      //   selectedHandles,
-      // });
-      // setCsvData(data);
-      // csvLinkEl.current.link.click();
+      const { data } = await axios.post(
+        'https://delnero-ig-stat.herokuapp.com/ig-proposal',
+        {
+          selectedHandles,
+        }
+      );
+      setCsvData(data);
+      csvLinkEl.current.link.click();
     } catch (err) {
       console.log(`Error1: ${err}`);
       if (err.response.data.message.includes('undefined')) {
