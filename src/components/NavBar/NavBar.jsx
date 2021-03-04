@@ -1,10 +1,30 @@
 import React from 'react';
-import { Box, IconButton, Text, useColorMode, Flex } from '@chakra-ui/react';
-import { MoonIcon, SunIcon } from '@chakra-ui/icons';
+import {
+  Button,
+  HStack,
+  IconButton,
+  Text,
+  useColorMode,
+  Flex,
+} from '@chakra-ui/react';
+import { MoonIcon, SunIcon, ArrowForwardIcon } from '@chakra-ui/icons';
+
+import { isLoggedIn } from '../../utils/isLoggedIn';
+import { logOutUser } from '../../actions/users';
+
+const bgColor = { light: 'gray.200', dark: 'gray.600' };
 
 const NavBar = () => {
   const { colorMode, toggleColorMode } = useColorMode();
-  const bgColor = { light: 'gray.200', dark: 'gray.600' };
+
+  const handleLogOut = async (e) => {
+    const data = await logOutUser();
+    if (!data.success) {
+      console.log({ title: data.message });
+    } else {
+      window.location.reload();
+    }
+  };
 
   return (
     <Flex
@@ -14,21 +34,28 @@ const NavBar = () => {
       mb={8}
       justify="space-between"
       align="center"
-      border="1px solid red"
     >
       <Text ml={4} fontSize="3xl">
         IG Stats for Proposal
       </Text>
 
-      <Box mr={7} border="1px solid blue">
+      <HStack mr={10} spacing={10}>
+        {isLoggedIn() && (
+          <Button
+            rightIcon={<ArrowForwardIcon />}
+            colorScheme="teal"
+            variant="solid"
+            onClick={handleLogOut}
+          >
+            Log out
+          </Button>
+        )}
         <IconButton
-          rounded="full"
+          rounded="round"
           onClick={toggleColorMode}
           icon={colorMode === 'light' ? <SunIcon /> : <MoonIcon />}
-        >
-          Change Color Mode
-        </IconButton>
-      </Box>
+        />
+      </HStack>
     </Flex>
   );
 };

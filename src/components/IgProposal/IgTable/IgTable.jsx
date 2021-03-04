@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
+// import axios from 'axios';
 import { CSVLink } from 'react-csv';
 import {
   Checkbox,
@@ -7,6 +7,7 @@ import {
   Editable,
   EditableInput,
   EditablePreview,
+  IconButton,
   NumberInput,
   NumberInputField,
   Table,
@@ -15,9 +16,12 @@ import {
   Th,
   Tr,
   Td,
+  useToast,
 } from '@chakra-ui/react';
+import { CloseIcon } from '@chakra-ui/icons';
 
 import Error from '../../Error/Error';
+import { deleteHandle, updateHandle } from '../../../actions/ighandles';
 
 const headers = [
   { label: 'IG handle', key: 'handle' },
@@ -27,26 +31,20 @@ const headers = [
   { label: 'Engagement Rate', key: 'engRate' },
 ];
 
-const IgTable = ({ list, setList }) => {
+const IgTable = ({ list, setList, loadList }) => {
+  console.log('table', list);
   const [error, setError] = useState(null);
   const [csvData, setCsvData] = useState([]);
   const csvLinkEl = useRef();
+  const toast = useToast();
 
   const handleChange = (e) => {
     const { id, name, value } = e.target;
 
-    if (value && id) {
-      let newArr = list.map((item) => {
-        if (item.id === id) {
-          item.handle = value;
-        }
-        return item;
-      });
-      setList(newArr);
-    } else if (id) {
+    if (id) {
       e.preventDefault();
       let newArr = list.map((item) => {
-        if (item.id === id) {
+        if (item.id === Number(id)) {
           item.checked = !item.checked;
         }
         return item;
@@ -63,15 +61,41 @@ const IgTable = ({ list, setList }) => {
     }
   };
 
+  const updateIghandle = async (id, value) => {
+    const { message } = await updateHandle(id, value);
+    toast({
+      title: 'Changed.',
+      description: message,
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+    // window.location.reload();
+    loadList();
+  };
+
+  const deleteIghandle = async (id) => {
+    const { message } = await deleteHandle(id);
+    toast({
+      title: 'Deleted.',
+      description: message,
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
+    loadList();
+  };
+
   const getData = async () => {
     let selectedHandles = list.filter((item) => item.checked);
-    try {
-      const { data } = await axios.post('http://localhost:5000/ig-proposal', {
-        selectedHandles,
-      });
 
-      setCsvData(data);
-      csvLinkEl.current.link.click();
+    console.log('selected', selectedHandles);
+    try {
+      // const { data } = await axios.post('http://localhost:5000/ig-proposal', {
+      //   selectedHandles,
+      // });
+      // setCsvData(data);
+      // csvLinkEl.current.link.click();
     } catch (err) {
       console.log(`Error1: ${err}`);
       if (err.response.data.message.includes('undefined')) {
@@ -111,6 +135,7 @@ const IgTable = ({ list, setList }) => {
             <Th>-</Th>
             <Th>IG user</Th>
             <Th>Posts</Th>
+            <Th>Delete</Th>
           </Tr>
         </Thead>
         <Tbody>
@@ -125,14 +150,14 @@ const IgTable = ({ list, setList }) => {
                 />
               </Td>
               <Td>
-                <Editable w="200px" defaultValue={listItem.handle}>
+                <Editable
+                  w="200px"
+                  id={listItem.id}
+                  defaultValue={listItem.handle}
+                  onSubmit={(e) => updateIghandle(listItem.id, e)}
+                >
                   <EditablePreview />
-                  <EditableInput
-                    px={2}
-                    id={listItem.id}
-                    value={listItem.handle}
-                    onChange={handleChange}
-                  />
+                  <EditableInput px={2} value={listItem.handle} />
                 </Editable>
               </Td>
               <Td>
@@ -143,6 +168,15 @@ const IgTable = ({ list, setList }) => {
                     onChange={handleChange}
                   />
                 </NumberInput>
+              </Td>
+              <Td>
+                <IconButton
+                  variant="unstyled"
+                  rounded="full"
+                  color="red"
+                  onClick={() => deleteIghandle(listItem.id)}
+                  icon={<CloseIcon />}
+                />
               </Td>
             </Tr>
           ))}

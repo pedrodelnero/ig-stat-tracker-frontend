@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import axios from 'axios';
 import {
   Input,
   Stack,
@@ -12,28 +11,28 @@ import {
 import { InfoIcon, LockIcon } from '@chakra-ui/icons';
 
 import Error from '../../Error/Error';
+import { logInUser } from '../../../actions/users';
 
-const SignUp = (props) => {
+const bgColor = { light: 'white', dark: 'gray.600' };
+
+const SignUp = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const { colorMode } = useColorMode();
-  const bgColor = { light: 'white', dark: 'gray.600' };
-  axios.defaults.withCredentials = true;
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      await axios.post('http://localhost:5000/login', {
-        username,
-        password,
-      });
-      window.location.href = '/';
-    } catch (err) {
-      console.log(`Error1: ${err}`);
-      setError({ title: err.response.data });
+
+    const data = await logInUser(username, password);
+
+    if (!data.success) {
+      setError({ title: data.message });
+    } else {
+      window.location.reload();
     }
   };
+
   return (
     <>
       {error && <Error error={error} />}

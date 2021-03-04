@@ -1,13 +1,17 @@
 import Cookies from 'js-cookie';
 
-const TOKEN_KEY = 'userId';
+const TOKEN_KEY = 'token';
+var eightHours = new Date(new Date().getTime() + 8 * 60 * 60 * 1000);
 
-export const logout = () => {
-  localStorage.removeItem(TOKEN_KEY);
+export const signUp = (token) => {
+  Cookies.set(TOKEN_KEY, token, { expires: eightHours });
+};
+
+export const logOut = () => {
+  Cookies.remove(TOKEN_KEY);
 };
 
 export const isLoggedIn = () => {
-  console.log('cookie', Cookies.get(TOKEN_KEY));
   if (Cookies.get(TOKEN_KEY)) {
     return true;
   }

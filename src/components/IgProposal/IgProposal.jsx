@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -12,34 +11,65 @@ import {
 import { AtSignIcon } from '@chakra-ui/icons';
 
 import IgTable from './IgTable/IgTable';
+import { createHandle, getHandles } from '../../actions/ighandles';
+import Error from '../Error/Error';
 
 const initialState = {
-  id: 0,
   igHandle: '',
   igPosts: 0,
   isChecked: false,
 };
 
 const IgProposal = () => {
+  const [error, setError] = useState(null);
   const [igUser, setIgUser] = useState(initialState);
   const [listOfHandles, setListOfHandles] = useState([]);
+  console.log('proposal', listOfHandles);
 
-  const addHandleToList = (e) => {
+  const addHandleToList = async (e) => {
     e.preventDefault();
-    setListOfHandles((oldArr) => [
-      ...oldArr,
-      {
-        id: uuidv4(),
-        handle: igUser.igHandle,
-        posts: igUser.igPosts,
-        checked: igUser.isChecked,
-      },
-    ]);
-    setIgUser(initialState);
+    const data = await createHandle(igUser);
+
+    if (!data.success) {
+      console.log({ title: data.message });
+      setError({ title: data.message });
+    } else {
+      setListOfHandles((oldArr) => [
+        ...oldArr,
+        {
+          id: data.id,
+          handle: igUser.igHandle,
+          posts: igUser.igPosts,
+          checked: igUser.isChecked,
+        },
+      ]);
+      setIgUser(initialState);
+    }
   };
+
+  const loadIgList = useCallback(async () => {
+    // console.log('load porposal', listOfHandles);
+    try {
+      const { data } = await getHandles();
+      let newList = data.map((dataItem) => ({
+        id: dataItem.id,
+        handle: dataItem.handle,
+        posts: 0,
+        checked: false,
+      }));
+      setListOfHandles(newList);
+    } catch (err) {
+      console.log(`Err load list: ${err}`);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadIgList();
+  }, [loadIgList]);
 
   return (
     <Box mx={8} p={5} bg="" w="100%">
+      {error && <Error error={error} />}
       <Text fontSize="2xl" mb={3}>
         Add IG handle
       </Text>
@@ -73,7 +103,11 @@ const IgProposal = () => {
         </form>
       </Box>
       {listOfHandles.length > 0 && (
-        <IgTable list={listOfHandles} setList={setListOfHandles} />
+        <IgTable
+          list={listOfHandles}
+          setList={setListOfHandles}
+          loadList={loadIgList}
+        />
       )}
     </Box>
   );
